@@ -84,6 +84,21 @@ opt = keras.optimizers.RMSprop(lr=0.0001, clipnorm=1.)
 model.compile(optimizer=opt, loss='binary_crossentropy' , metrics=['acc'])
 model.summary()
 
+test_uuid = "FA4DC2D8-C0D9-4ECB-A319-70F156E3AF31"
+rxs = np.fromfile(vpath+test_uuid+".bins", dtype=np.uint16 ).astype('float32')
+rxs -= rxs.mean()
+rxs /= rxs.std()+0.0001
+rxs = np.reshape( rxs, (-1,256,256,1), 'C')
+rys = np.loadtxt(vpath+test_uuid+".labels", dtype=np.float32)
+
+validation_uuid = "FA4DC2D8-C0D9-4ECB-A319-70F156E3AF31"
+xs = np.fromfile(vpath+validation_uuid+".bins", dtype=np.uint16 ).astype('float32')
+xs -= xs.mean()
+xs /= xs.std()+0.0001
+xs = np.reshape( xs, (-1,256,256,1), 'C')
+ys = np.loadtxt(vpath+validation_uuid+".labels", dtype=np.float32)
+
+
 class DebugCallback(keras.callbacks.Callback):
 #    def on_batch_end(self, batch, logs={}):
     def on_epoch_end(self, epoch, logs={} ):
@@ -99,15 +114,10 @@ callbacks = [  keras.callbacks.TensorBoard(log_dir='log', histogram_freq=1)
              , keras.callbacks.ModelCheckpoint( 'modelcpnt'+str(run_uuid)+'.hdf5', monitor='val_loss', verbose=1, save_best_only=True)
              , debug ]
 
+
 model.fit_generator(data_generator(100),epochs=100,validation_data= (xs,ys[:,0]),steps_per_epoch=60,callbacks=callbacks)
 
-test_uuid = "FA4DC2D8-C0D9-4ECB-A319-70F156E3AF31"
-rxs = np.fromfile(vpath+test_uuid+".bins", dtype=np.uint16 ).astype('float32')
-rxs -= rxs.mean()
-rxs /= rxs.std()+0.0001
-rxs = np.reshape( rxs, (-1,256,256,1), 'C')
-rys = np.loadtxt(vpath+test_uuid+".labels", dtype=np.float32)
-cd
+
 predictions = model.predict(rxs)
 res = np.concatenate( (rys,predictions), -1 )
 plt.plot(res[:,1], res[:,2], 'bo')
