@@ -11,7 +11,7 @@ The directory "data" contains ultrasonic data sets, containing various flaws. Ea
 * .jsons file, that contains a json-formatted meta-data for each binary file. This includes the locations of all flaws, source flaw size and "equivalent size"
 * .labels file, that contain tab-separated data for flaw existence (0/1) and equivalent flaw size.
 
-The directory "src" contains python code to train a deep CNN using the data provided. Use "make train" to run. 
+The directory "src" contains python code to train a deep CNN using the data provided. Use "./train.py" to run. 
 
 To make inference, you can consult the sample code in src/inference.py.
 
